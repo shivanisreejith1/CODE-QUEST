@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code Quest — Learn to Code Through Adventure</title>
+  <meta name="description" content="An interactive story game that teaches coding concepts through adventure. Learn variables, loops, conditionals, and functions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f0f13;
+      --surface: #17171e;
+      --surface2: #1e1e28;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text: #e8e8f0;
+      --text2: #8888a8;
+      --text3: #55556a;
+      --purple: #8b5cf6;
+      --purple-dim: #4c1d95;
+      --purple-glow: rgba(139,92,246,0.15);
+      --teal: #14b8a6;
+      --teal-dim: #0d4f46;
+      --amber: #f59e0b;
+      --amber-dim: #78350f;
+      --red: #ef4444;
+      --red-dim: #7f1d1d;
+      --green: #22c55e;
+      --green-dim: #14532d;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', system-ui, sans-serif;
+      --radius: 10px;
+      --radius-lg: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── Landing ── */
+    #landing {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      opacity: 0.35;
+    }
+    .orb1 { width: 500px; height: 500px; background: #4c1d95; top: -120px; left: -120px; }
+    .orb2 { width: 400px; height: 400px; background: #0d4f46; bottom: -80px; right: -80px; }
+
+    .landing-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 560px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--purple);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      margin-bottom: 2rem;
+    }
+    .eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    .landing-title {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      letter-spacing: -0.03em;
+    }
+    .landing-title .accent { color: var(--purple); }
+
+    .landing-sub {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--text2);
+      margin-bottom: 2.5rem;
+    }
+
+    .concepts-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2.5rem;
+    }
+    .concept-pill {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      background: var(--surface);
+    }
+
+    .start-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--purple);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 32px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: -0.01em;
+    }
+    .start-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .start-btn:active { transform: scale(0.98); }
+    .start-btn svg { width: 18px; height: 18px; }
+
+    .landing-stats {
+      margin-top: 3rem;
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 1.5rem; font-weight: 600; color: var(--text); }
+    .stat-label { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    /* ── Game ── */
+    #game {
+      display: none;
+      width: 100%;
+      max-width: 680px;
+      min-height: 100vh;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .top-logo {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--purple);
+      letter-spacing: -0.01em;
+    }
+    .hud {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .hud-chip {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+    }
+    .hud-chip span { color: var(--text); font-weight: 600; }
+
+    .progress-track {
+      height: 3px;
+      background: var(--surface2);
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--purple);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .concept-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple);
+      background: var(--purple-glow);
+      border: 1px solid rgba(139,92,246,0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .concept-tag-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); }
+
+    .scene-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+
+    .story-text {
+      font-size: 14.5px;
+      line-height: 1.75;
+      color: var(--text2);
+      margin-bottom: 1.5rem;
+    }
+    .story-text em { font-style: italic; color: var(--text3); }
+    .story-text strong { color: var(--text); font-weight: 500; }
+
+    .code-block {
+      background: #0a0a10;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.9;
+      color: #c9c9e8;
+      white-space: pre-wrap;
+      margin-bottom: 1.25rem;
+    }
+    .kw { color: #a78bfa; }
+    .str { color: #34d399; }
+    .num { color: #fb923c; }
+    .blank {
+      display: inline-block;
+      background: rgba(245,158,11,0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245,158,11,0.3);
+      border-radius: 5px;
+      padding: 0 8px;
+      min-width: 36px;
+      text-align: center;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-weight: 500;
+      transition: background 0.15s;
+    }
+    .blank:hover { background: rgba(245,158,11,0.25); }
+
+    .choices { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem; }
+    .choice-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 13px 16px;
+      font-family: var(--sans);
+      font-size: 13.5px;
+      color: var(--text2);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .choice-btn:hover { border-color: var(--border2); color: var(--text); background: rgba(255,255,255,0.03); }
+    .choice-btn .choice-letter {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--text3);
+    }
+    .choice-btn.correct { border-color: var(--teal); background: rgba(20,184,166,0.08); color: var(--text); }
+    .choice-btn.correct .choice-letter { background: var(--teal); border-color: var(--teal); color: #fff; }
+    .choice-btn.wrong { border-color: var(--red); background: rgba(239,68,68,0.08); color: var(--text2); }
+    .choice-btn.wrong .choice-letter { background: var(--red); border-color: var(--red); color: #fff; }
+
+    .fill-label { font-size: 12px; color: var(--text3); margin-bottom: 10px; font-weight: 500; letter-spacing: 0.03em; }
+    .fill-choices { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.25rem; }
+    .fill-opt {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      padding: 6px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--text2);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .fill-opt:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-glow); }
+    .fill-opt.used { opacity: 0.25; pointer-events: none; }
+
+    .feedback-box {
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      font-size: 13.5px;
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+    .feedback-box.good { background: rgba(20,184,166,0.08); border: 1px solid rgba(20,184,166,0.25); color: #5eead4; }
+    .feedback-box.bad { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+    .feedback-box strong { font-weight: 600; display: block; margin-bottom: 6px; }
+    .feedback-box p { color: var(--text2); margin-top: 6px; }
+
+    .xp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(245,158,11,0.15);
+      color: var(--amber);
+      border-radius: 20px;
+      padding: 2px 10px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .badge-earned {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 1.25rem;
+    }
+    .badge-earned .badge-icon {
+      background: rgba(139,92,246,0.15);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 6px;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--purple);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 11px 22px;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--text3);
+      font-family: var(--sans);
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-ghost:hover { color: var(--text2); border-color: var(--border2); }
+
+    /* ── End screen ── */
+    .end-trophy {
+      font-size: 64px;
+      text-align: center;
+      display: block;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+    .end-title {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .end-sub { font-size: 14px; color: var(--text2); text-align: center; margin-bottom: 1.75rem; }
+    .end-stats { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .end-stat {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 20px;
+      text-align: center;
+      min-width: 100px;
+    }
+    .end-stat-val { font-size: 1.4rem; font-weight: 600; }
+    .end-stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+    .badges-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 2rem; }
+    .earned-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 14px;
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 20px;
+      color: #c4b5fd;
+    }
+    .end-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .card { padding: 1.25rem; }
+      .landing-title { font-size: 2rem; }
+      .choices { gap: 6px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Landing Screen ── -->
+<section id="landing">
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <div class="landing-inner">
+    <div class="eyebrow">
+      <span class="eyebrow-dot"></span>
+      Interactive Learning Game
+    </div>
+    <h1 class="landing-title">
+      Learn to code<br>through <span class="accent">adventure</span>
+    </h1>
+    <p class="landing-sub">
+      Five story-driven chapters. Real coding concepts. No setup required.
+      Play in your browser and level up from apprentice to dragon tamer.
+    </p>
+    <div class="concepts-row">
+      <span class="concept-pill">Variables</span>
+      <span class="concept-pill">Conditionals</span>
+      <span class="concept-pill">Loops</span>
+      <span class="concept-pill">Functions</span>
+      <span class="concept-pill">Logic</span>
+    </div>
+    <button class="start-btn" onclick="startGame()" aria-label="Start the adventure">
+      Start the adventure
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <div class="landing-stats">
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">chapters</div></div>
+      <div class="stat"><div class="stat-num">~10min</div><div class="stat-label">to complete</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">badges to earn</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Game Screen ── -->
+<main id="game" role="main" aria-label="Code Quest game">
+  <div class="top-bar">
+    <div class="top-logo">⚔️ Code Quest</div>
+    <div class="hud">
+      <div class="hud-chip">✨ <span id="xp-val">0</span> XP</div>
+      <div class="hud-chip">❤️ <span id="hp-val">3</span>/3</div>
+      <div class="hud-chip">📍 <span id="ch-val">1</span> of 5</div>
+    </div>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress" style="width:0%"></div>
+  </div>
+  <div id="scene" aria-live="polite"></div>
+</main>
+
+<script>
+const SCENES = [
+  {
+    id: 0,
+    concept: "Variables",
+    title: "The Kingdom of Syntax",
+    story: `You are a young apprentice wizard in the Kingdom of Syntax, where all magic is written in code. The Royal Archivist — an ancient owl named <em>Logicus</em> — greets you at the castle gates.\n\n"Before you can cast spells, you must understand the first law of magic: every spell needs a <strong>name</strong> to hold its power. We call these <strong>variables</strong>."\n\nA locked door blocks your path. The inscription reads:\n\n<em>"What keyword does a wizard use to declare a new variable in JavaScript?"</em>`,
+    type: "mc",
+    options: ["function", "var", "spell", "assign"],
+    correct: 1,
+    feedback_good: "Correct! <code>var</code> (along with <code>let</code> and <code>const</code>) is used to create variables. Logicus nods approvingly — the door swings open.",
+    feedback_bad: "<code>var</code>, <code>let</code>, and <code>const</code> are the keywords for variables in JavaScript. <code>function</code> defines a function, and the others aren't valid keywords.",
+    xp: 20, badge: "Variable Whisperer", badgeIcon: "📦"
+  },
+  {
+    id: 1,
+    concept: "Conditionals (if/else)",
+    title: "The Crossroads Forest",
+    story: `You enter a dark forest. Two paths appear. A mischievous fox leaps out.\n\n"I guard these paths! Only those who understand <strong>conditionals</strong> may pass. An <strong>if/else</strong> statement lets your spell make decisions — do this <em>or</em> do that, depending on the situation."\n\nA spell below should store <em>"Hero"</em> if the traveller has a sword, and <em>"Villager"</em> otherwise. One word is missing — fill in the blank!`,
+    type: "fill",
+    code_parts: ["name = ", "___", " (hasSword) {", '\n  name = "Hero"', "\n} else {", '\n  name = "Villager"', "\n}"],
+    blanks: [{index: 1, answer: "if"}],
+    options: ["while", "if", "else", "var"],
+    feedback_good: "Exactly right! <code>if</code> checks a condition. If it's true, run the first block; otherwise, run the <code>else</code> block. The fox bows and steps aside.",
+    feedback_bad: "<code>if</code> starts a conditional check. <code>while</code> is for loops, <code>else</code> handles the false case, <code>var</code> is for variables.",
+    xp: 25, badge: "Path Decider", badgeIcon: "🔀"
+  },
+  {
+    id: 2,
+    concept: "Loops",
+    title: "The Enchanted Mill",
+    story: `You arrive at an old mill where a tired gnome is stacking 100 sacks of grain, one by one, muttering the same words on every trip.\n\n"There must be a better way," you say. The gnome looks up hopefully.\n\n"Loops!" you exclaim. "A <strong>loop</strong> repeats a block of code automatically until a condition is met — no need to write the same thing over and over."\n\n<em>Which of the following correctly loops from 1 to 5 in JavaScript?</em>`,
+    type: "mc",
+    options: [
+      "repeat(5) { stack() }",
+      "for (let i = 1; i <= 5; i++) { stack(i) }",
+      "if (i < 5) { stack(i) }",
+      "loop 1 to 5 stack()"
+    ],
+    correct: 1,
+    feedback_good: "Perfect! A <code>for</code> loop has three parts: start (<code>let i = 1</code>), condition (<code>i <= 5</code>), and increment (<code>i++</code>). The gnome cheers as all 5 sacks stack instantly.",
+    feedback_bad: "The <code>for</code> loop is the right tool. It has three parts: starting value, stopping condition, and how to advance each step. <code>if</code> is a conditional, not a loop.",
+    xp: 30, badge: "Loop Weaver", badgeIcon: "🔁"
+  },
+  {
+    id: 3,
+    concept: "Functions",
+    title: "The Wizard's Tower",
+    story: `At the top of a tall tower, the Grand Wizard is asleep at her desk, surrounded by scrolls of messy, repeated code.\n\n"Functions are the highest art," she mumbles, waking up. "A <strong>function</strong> is a reusable spell — write the steps once, give it a name, and <em>call</em> it whenever you need it."\n\nShe hands you a broken spell that should greet any hero by name. Fill in the missing keyword:`,
+    type: "fill",
+    code_parts: ["___", " greetHero(name) {", '\n  return "Hello, " + name + "!"', "\n}"],
+    blanks: [{index: 0, answer: "function"}],
+    options: ["var", "if", "function", "call"],
+    feedback_good: "<code>function</code> is the keyword that defines a reusable block of code. The spell lights up and greets you by name. The wizard applauds!",
+    feedback_bad: "<code>function</code> is the keyword you need. It tells JavaScript you're defining a reusable block. <code>var</code> is for variables, <code>if</code> is for conditions.",
+    xp: 30, badge: "Function Forger", badgeIcon: "⚡"
+  },
+  {
+    id: 4,
+    concept: "Putting it all together",
+    title: "The Dragon's Riddle",
+    story: `The final challenge! A dragon blocks the vault of the Royal Treasury. She narrows her golden eyes.\n\n"You have learned variables, conditionals, loops, and functions. Answer my final riddle to claim the treasure."\n\nShe breathes smoke that forms these words:\n\n<em>"A function runs a loop from 1 to 3. Inside, it checks: if the number equals 2, it stores the word 'Dragon'. What will be stored in the variable after the loop ends?"</em>`,
+    type: "mc",
+    options: ["'Dragon'", "1", "3", "Nothing — there's an error"],
+    correct: 0,
+    feedback_good: "Right! When <code>i</code> reaches 2, the condition is true and 'Dragon' gets stored. The loop finishes, but that value persists. The dragon roars and flies away — the vault is yours!",
+    feedback_bad: "When the loop reaches <code>i = 2</code>, the <code>if</code> condition is true and 'Dragon' gets assigned. That value stays after the loop ends.",
+    xp: 40, badge: "Dragon Tamer", badgeIcon: "🐉"
+  }
+];
+
+let G = { scene: 0, xp: 0, hp: 3, badges: [], phase: "q", fills: {}, lastOk: null };
+
+const LETTERS = ["A","B","C","D"];
+
+function updateHUD() {
+  document.getElementById("xp-val").textContent = G.xp;
+  document.getElementById("hp-val").textContent = G.hp;
+  document.getElementById("ch-val").textContent = G.scene + 1;
+  document.getElementById("progress").style.width = (G.scene / SCENES.length * 100) + "%";
+}
+
+function colorCode(s) {
+  const kws = ["if","else","for","function","var","let","const","return","while"];
+  s = s.replace(/("([^"]*)")/g, '<span class="str">$1</span>');
+  kws.forEach(k => {
+    s = s.replace(new RegExp(`\\b(${k})\\b`, "g"), '<span class="kw">$1</span>');
+  });
+  s = s.replace(/\b(\d+)\b/g, '<span class="num">$1</span>');
+  return s;
+}
+
+function buildCode(parts, blanks, fills) {
+  return parts.map((p, i) => {
+    const b = blanks && blanks.find(x => x.index === i);
+    if (b) {
+      const v = fills[i] || "___";
+      return `<span class="blank" data-bi="${i}">${v}</span>`;
+    }
+    return colorCode(p);
+  }).join("");
+}
+
+function render() {
+  const el = document.getElementById("scene");
+  if (G.scene >= SCENES.length) { renderEnd(el); return; }
+  updateHUD();
+  const sc = SCENES[G.scene];
+  G.phase === "q" ? renderQ(el, sc) : renderFeedback(el, sc);
+}
+
+function renderQ(el, sc) {
+  const conceptTag = `<div class="concept-tag"><span class="concept-tag-dot"></span>${sc.concept}</div>`;
+  const title = `<h2 class="scene-title">${sc.title}</h2>`;
+  const story = `<p class="story-text">${sc.story.replace(/\n/g, "<br>")}</p>`;
+
+  let interactive = "";
+  if (sc.type === "mc") {
+    interactive = `<div class="choices" role="group" aria-label="Answer choices">` +
+      sc.options.map((o, i) =>
+        `<button class="choice-btn" onclick="answerMC(${i})" aria-label="Option ${LETTERS[i]}: ${o}">
+          <span class="choice-letter">${LETTERS[i]}</span>${o}
+        </button>`
+      ).join("") + `</div>`;
+  } else {
+    interactive = `<div class="code-block">${buildCode(sc.code_parts, sc.blanks, G.fills)}</div>
+      <p class="fill-label">Choose the missing word</p>
+      <div class="fill-choices" id="fill-opts">` +
+        sc.options.map(o =>
+          `<button class="fill-opt" onclick="fillIn('${o}')">${o}</button>`
+        ).join("") + `</div>`;
+  }
+
+  el.innerHTML = `<div class="card">${conceptTag}${title}${story}${interactive}</div>`;
+}
+
+function renderFeedback(el, sc) {
+  const ok = G.lastOk;
+  const conceptTag = `<div class="concept-tag"><span class="concept-tag-dot"></span>${sc.concept}</div>`;
+  const title = `<h2 class="scene-title">${sc.title}</h2>`;
+
+  const fb = `<div class="feedback-box ${ok ? 'good' : 'bad'}">
+    <strong>${ok ? "✓ Correct!" : "✗ Not quite."} ${ok ? `<span class="xp-badge">+${sc.xp} XP</span>` : ""}</strong>
+    <p>${ok ? sc.feedback_good : sc.feedback_bad}</p>
+  </div>`;
+
+  const bdg = ok ? `<div class="badge-earned"><span class="badge-icon">${sc.badgeIcon}</span> Badge earned: ${sc.badge}</div>` : "";
+  const nextLabel = G.scene < SCENES.length - 1 ? "Continue →" : "Claim your treasure →";
+
+  el.innerHTML = `<div class="card">${conceptTag}${title}${fb}${bdg}
+    <div class="btn-row">
+      <button class="btn-primary" onclick="nextScene()">${nextLabel}</button>
+    </div>
+  </div>`;
+}
+
+function renderEnd(el) {
+  document.getElementById("progress").style.width = "100%";
+  document.getElementById("ch-val").textContent = "5";
+  const grade = G.xp >= 130 ? "🌟 Legendary" : G.xp >= 100 ? "⭐ Master" : G.xp >= 70 ? "✨ Adept" : "🔰 Apprentice";
+  el.innerHTML = `<div class="card" style="text-align:center;">
+    <span class="end-trophy">🏆</span>
+    <h2 class="end-title">Quest Complete!</h2>
+    <p class="end-sub">You've mastered the four pillars of the Kingdom of Syntax.</p>
+    <div class="end-stats">
+      <div class="end-stat"><div class="end-stat-val">${G.xp}</div><div class="end-stat-label">XP earned</div></div>
+      <div class="end-stat"><div class="end-stat-val">${G.hp}/3</div><div class="end-stat-label">HP remaining</div></div>
+      <div class="end-stat"><div class="end-stat-val">${G.badges.length}/5</div><div class="end-stat-label">badges</div></div>
+      <div class="end-stat"><div class="end-stat-val" style="font-size:1rem">${grade}</div><div class="end-stat-label">rank</div></div>
+    </div>
+    <div class="badges-grid">
+      ${G.badges.map(b => `<span class="earned-badge">${b.icon} ${b.name}</span>`).join("")}
+    </div>
+    <div class="end-actions">
+      <button class="btn-ghost" onclick="restart()">↺ Play again</button>
+    </div>
+  </div>`;
+}
+
+function answerMC(i) {
+  const sc = SCENES[G.scene];
+  const ok = i === sc.correct;
+  if (ok) { G.xp += sc.xp; G.badges.push({name: sc.badge, icon: sc.badgeIcon}); }
+  else G.hp = Math.max(0, G.hp - 1);
+  G.lastOk = ok;
+  G.phase = "fb";
+  render();
+}
+
+function fillIn(val) {
+  const sc = SCENES[G.scene];
+  const b = sc.blanks[0];
+  G.fills[b.index] = val;
+  const ok = val === b.answer;
+  if (ok) { G.xp += sc.xp; G.badges.push({name: sc.badge, icon: sc.badgeIcon}); }
+  else G.hp = Math.max(0, G.hp - 1);
+  G.lastOk = ok;
+  G.phase = "fb";
+  render();
+}
+
+function nextScene() {
+  G.scene++;
+  G.phase = "q";
+  G.fills = {};
+  render();
+}
+
+function restart() {
+  G = { scene: 0, xp: 0, hp: 3, badges: [], phase: "q", fills: {}, lastOk: null };
+  render();
+}
+
+function startGame() {
+  document.getElementById("landing").style.display = "none";
+  document.getElementById("game").style.display = "block";
+  render();
+}
+</script>
+</body>
+</html>
