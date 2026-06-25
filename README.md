@@ -36,8 +36,10 @@ An interactive web-based game that teaches JavaScript fundamentals through story
 
 ---
 
-## 🚀 Getting Started
+## 🌐 Live Demo
+🔗 https://shivanisreejith1.github.io/CODE-QUEST/
 
+Getting Started
 1. Clone the repository.
 2. Open `index.html` in your browser.
 3. Start your coding adventure.
