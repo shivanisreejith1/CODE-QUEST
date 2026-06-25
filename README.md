@@ -1,10 +1,10 @@
-# 🎮 Code Quest
+#  Code Quest
 
 An interactive web-based game that teaches JavaScript fundamentals through storytelling and coding challenges. Players progress through a series of chapters, solving programming puzzles while earning XP, unlocking achievements, and advancing through the adventure.
 
 ---
 
-## ✨ Features
+##  Features
 
 * Story-driven gameplay
 * Interactive coding challenges
